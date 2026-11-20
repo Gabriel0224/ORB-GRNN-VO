@@ -1,10 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Exact two-layer causal graph DAG. Context is explicit at each layer.
-
-Encoder keys: physical frame pair. Graph1 keys: (pair,min(window_position,1)).
-Graph2 keys: (pair,min(window_position,2)). Attention still uses original
-canonical padding keys; this only eliminates repeated deterministic graph work.
-"""
+"""Deduplicate graph nodes by frame pair and window-limited history."""
 import numpy as np
 import torch
 from torch.nn import functional as F

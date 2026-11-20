@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Learning-rate scheduling driven by complete held-out validation loss."""
 import math
 
 import torch
@@ -9,7 +8,7 @@ V3_LEARNING_RATES = (1e-4, 7e-5, 4e-5, 1e-5, 7e-6, 4e-6, 1e-6, 7e-7, 4e-7, 1e-7)
 
 
 class V3ValidationStaircase:
-    """Lower one fixed rung after exactly twenty non-improving full validations."""
+    """Lower the learning rate after 20 validations without improvement."""
     def __init__(self, optimizer):
         self.optimizer = optimizer
         self.stage, self.last_epoch, self.num_bad_epochs = 0, 0, 0

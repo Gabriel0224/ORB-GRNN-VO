@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Read-only ORB candidate inputs; independent causal windows and native grouping."""
 from collections import OrderedDict
 from pathlib import Path
 import json
@@ -148,7 +147,6 @@ def pack(sequence, starts, length=10, targets=True):
 
 
 class PreparedBatches:
-    """Bounded CPU cache; no experiment-specific global paths or GPU allocations."""
     def __init__(self, root, records, implementation="reference", cache_size=0):
         self.root, self.records = Path(root), records
         self.implementation, self.cache_size, self.cache = implementation, cache_size, OrderedDict()

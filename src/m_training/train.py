@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Train GRNN-VO from scratch, with complete validation and exact-state recovery."""
+"""Train GRNN-VO with validation and checkpoint recovery."""
 import argparse
 import copy
 import json
@@ -48,7 +48,7 @@ def stopping_reason(epoch, scheduler, max_epochs):
 
 
 def repair_logs(output, state):
-    """Checkpoint is the transaction boundary; preserve any uncommitted suffix."""
+    """Archive log entries after the checkpoint's committed step."""
     checkpoint_steps = state["global_step"]
     history = state["history"]
     expected_epochs = state["epoch"] if state["epoch_complete"] else state["epoch"] - 1
@@ -128,7 +128,6 @@ def _run_locked(config, inputs, prepared, output, device, resume):
     train = PreparedBatches(prepared, manifest["records"]["train"], e["implementation"], e["batch_cache_size"])
     val = PreparedBatches(prepared, manifest["records"]["validation"], "reference", e["batch_cache_size"])
     q = Sequence(inputs, config["data"]["validation_sequence"], config)
-    # Keep model creation after CPU-only setup and independent order generation.
     model = build_model(config).to(device).train()
     parameters = sum(p.numel() for p in model.parameters())
     if parameters != config["model"]["parameters"]:
@@ -269,7 +268,7 @@ def _run_locked(config, inputs, prepared, output, device, resume):
         state["history"].append(row)
         save(f"epoch_{epoch:03d}.pt")
         append_json(output / "training.jsonl", row)
-        save("last.pt")  # The committed checkpoint carries its complete epoch history.
+        save("last.pt")
         if loss_improved:
             commit_role("best_loss_all.pt", epoch)
         if ate_improved:

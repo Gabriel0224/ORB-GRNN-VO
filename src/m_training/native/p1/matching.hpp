@@ -1,4 +1,4 @@
-// P1 two-dimensional adapter derived from ORB-SLAM3 ORBmatcher.cc:
+// 2D matching adapted from ORB-SLAM3 ORBmatcher.cc:
 // SearchForInitialization, DescriptorDistance and ComputeThreeMaxima.
 // Copyright (C) 2014-2016 Raul Mur-Artal, Jose M.M. Montiel, Juan D. Tardos;
 // Copyright (C) 2017-2021 Carlos Campos, Richard Elvira, Juan J. Gomez Rodriguez,

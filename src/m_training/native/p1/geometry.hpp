@@ -1,4 +1,4 @@
-// P1 two-view image geometry. See geometry.cpp for the pinned ORB-SLAM3 source.
+// Two-view geometry; see geometry.cpp for ORB-SLAM3 attribution.
 #pragma once
 #include "matching.hpp"
 #include <random>

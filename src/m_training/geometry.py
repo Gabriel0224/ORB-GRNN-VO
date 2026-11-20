@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Pose conventions and initial-pose trajectory alignment for validation."""
 from pathlib import Path
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -33,11 +32,7 @@ def accumulate_poses(relative_vectors: np.ndarray) -> np.ndarray:
     return np.stack(result)
 
 def camera_from_cam0(calib_path: str | Path, camera: str) -> np.ndarray:
-    """Rectified KITTI extrinsic T_camN_cam0 from the projection matrices.
-
-    KITTI odometry pose files contain T_world_cam0 (see pykitti's odometry
-    loader). The chosen image stream may be another rectified camera.
-    """
+    """Return T_camN_cam0 from KITTI's rectified projection matrices."""
     result = np.eye(4)
     if camera == "image_0":
         return result

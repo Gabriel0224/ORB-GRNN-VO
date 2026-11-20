@@ -6,5 +6,5 @@
     "vendor/ORBextractor.cc": "c63ba40006b94d23cf93fd832fd7a48af835ddf087fb5dcc7caf9692b397f576",
     "vendor/ORBextractor.h": "0f6b92927ee8d4a69eaabdc9cbc473af5d61817a147f37ae97e2f6ac058388f9"
   },
-  "changes": "Native I/O accepts an explicit image list; no internal test runner; no resizing. Matching and H/F adapters retain their original mathematics and attribution."
+  "changes": "Image-list I/O with fixed calibrated image sizes; standalone matching and H/F geometry adapters."
 }

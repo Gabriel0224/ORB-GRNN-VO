@@ -104,7 +104,6 @@ float epipolar_error(const Matrix3f& f, const Vector3f& from, const Vector3f& po
     return residual * residual / denominator;
 }
 
-// The right null vector is the normalized DLT solution.
 bool null_matrix(const Eigen::MatrixXf& design, unsigned int options, bool require_rank_eight,
                  Matrix3f& matrix) {
     Eigen::JacobiSVD<Eigen::MatrixXf> svd(design, options);

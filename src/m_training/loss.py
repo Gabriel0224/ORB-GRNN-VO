@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Weighted pose loss: sum of six MSEs averaged over windows and time."""
 import torch
 AXES=("yaw","pitch","roll","tx","ty","tz")
 

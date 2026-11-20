@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Verify frozen inputs and create portable CPU training batches."""
+"""Prepare training batches from ORB features and pose labels."""
 import argparse
 import json
 from pathlib import Path
@@ -74,7 +74,6 @@ def main():
     parser.add_argument("--inspect-only", action="store_true", help="Verify hashes, windows and grouping without writing batch tensors")
     args = parser.parse_args()
     config = load_config(args.config)
-    # CPU preparation never calls CUDA and uses an independent order generator.
     torch.set_num_threads(config["execution"]["cpu_threads"])
     prepare(config, args.inputs, args.prepared, args.inspect_only)
 

@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""User images -> ORB observations -> normalized point features; labels are separate."""
 import argparse
 import json
 from pathlib import Path
@@ -80,7 +79,6 @@ def load_dataset(path, require_labels=False):
 
 
 def candidates_from_observations(path, K):
-    """No pose/label argument; preserve every selected geometric inlier."""
     arrays = {key: [] for key in ["x", "uv", "features", "previous"]}
     offsets, last_keys, last_features, last_uv = [0], None, np.empty(0, np.int64), None
     frame_count = 0
@@ -157,7 +155,6 @@ def load_poses(path, frames):
 
 
 def extract_dataset(dataset, output, binary, seed=42, with_labels=False):
-    """Generate runtime intermediates from user images; never load bundled caches."""
     import cv2
     records = load_dataset(dataset, require_labels=with_labels)
     output = Path(output).resolve()
@@ -189,7 +186,6 @@ def extract_dataset(dataset, output, binary, seed=42, with_labels=False):
         if with_labels:
             if pairs < 10:
                 raise ValueError("Training/validation needs at least 11 images per sequence")
-            # Labels are read only after image-only matching and point features are complete.
             poses = load_poses(item["poses"], len(files))
             valid = np.ones(pairs, bool)
             sources = np.zeros(pairs, np.int64)

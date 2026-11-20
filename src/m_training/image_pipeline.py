@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""One command from user images and supplied pose labels to trained GRNN-VO."""
+"""Train GRNN-VO from image sequences and pose labels."""
 import argparse
 import copy
 import json
@@ -28,7 +28,6 @@ def pipeline(dataset, config_path, work, device="cuda:0", resume=False, jobs=2, 
     validation = [k for k, v in records.items() if v["split"] == "validation"]
     if not train or len(validation) != 1:
         raise ValueError("Supply training sequences and exactly one separate complete validation sequence")
-    # Sequence names/counts are dataset metadata, not architecture hyperparameters.
     config = copy.deepcopy(config)
     config["data"].update(train_sequences=train, validation_sequence=validation[0], expected_counts=None)
     signature = {"dataset_sha256": sha256(dataset), "training_config": config_hash(config), "cache_policy": "keep"}

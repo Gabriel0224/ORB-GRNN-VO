@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Reuse paired features only for the same graph history and the exact reference attention padding."""
+"""Reuse features with identical graph contexts and attention layouts."""
 from collections import defaultdict
 import numpy as np
 import torch
@@ -20,7 +20,7 @@ def prepare(b,verify=True,canonical_chunk=32):
         for start in range(0,len(items),reference_groups):
             part=items[start:start+reference_groups]
             for frame,i in part:output_index[(key,frame)]=len(reps);reps.append(i)
-            # Pad back to the canonical batch-group and row dimensions in the attention reductions.
+            # Preserve reference padding in attention reductions.
             reps.extend([None]*(reference_groups-len(part)));groups.append((reference_groups,maximum))
     rev=np.asarray([output_index[k] for k in keys],dtype=np.int64)
     pts=[];neighbors=[];sizes=[];cursor=0;orig=b['neighbors'].numpy()
@@ -42,7 +42,6 @@ def bind(base,chunk=32,retain_nodes=65536,graph_checkpoint=False,compact_graph=F
             if not self.training or getattr(self.mlla,'canonical_once',False) or 'rep_index' not in b:
                 return super().forward(b,return_points)
             assert not return_points and self.mode=='M' and len(self.graph)==2
-            # Compute both graph layers in the full original layout, including all window boundaries.
             def encode_graph(raw,previous):
                 z=self.encoder(raw)
                 for layer in self.graph:z=layer(z,previous)

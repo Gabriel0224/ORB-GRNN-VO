@@ -1,9 +1,7 @@
 """Point-set adaptation of MLLA.
 
-MLLA gate/ELU+1 attention/RoPE/FFN follows LeapLabTHU/MLLA (MIT).
+Based on LeapLabTHU/MLLA (MIT).
 Copyright (c) Microsoft Corporation. See LICENSES/MLLA-MIT.txt.
-The four grid depthwise convolutions become independent continuous point kernels.
-All attention and local neighbors are isolated to one frame pair in one window.
 """
 import numpy as np
 import torch
@@ -84,7 +82,6 @@ class PointMLLA(nn.Module):
     def block(self,x,positions,neighbor_index,pad_index,pad_valid,unpad,counts):
         mask=(neighbor_index>=0).to(x.dtype);neighbors=neighbor_index.clamp_min(0)
         delta=positions[neighbors]-positions[:,None,:]
-        # Mask unused slots before the kernel, as well as before aggregation.
         delta=delta*mask.unsqueeze(-1)
         x=x+self.cpe1(x,delta,neighbors,mask)
         z=self.norm1(x);gate=F.silu(self.act_proj(z))

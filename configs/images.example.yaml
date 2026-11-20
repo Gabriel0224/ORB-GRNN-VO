@@ -15,7 +15,7 @@ sequences:
     split: train
     images: ./my_data/train_a/images
     pattern: '*.png'
-    # Replace all intrinsics with the calibration of YOUR rectified images.
+    # Intrinsics for the rectified images.
     intrinsics: [[700.0, 0.0, 620.0], [0.0, 700.0, 188.0], [0.0, 0.0, 1.0]]
     rectified: true
     poses: ./my_data/train_a/poses.txt

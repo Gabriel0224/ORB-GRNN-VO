@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Build and run the independent, pose-free ORB image frontend."""
 import argparse
 import json
 from pathlib import Path
@@ -75,7 +74,6 @@ def validate_settings(settings, width, height):
 
 
 def export(images, settings, width, height, directory, binary, seed):
-    """Only image paths and frontend settings cross the native process boundary."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=False)
     validate_settings(settings, width, height)

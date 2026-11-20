@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Image-list I/O adaptation; extraction, matching and H/F math are unchanged.
-// P1: open-loop 2D extraction and matching. Never creates an ORB-SLAM3 System.
 #include "ORBextractor.h"
 #include "geometry.hpp"
 #include <opencv2/imgcodecs.hpp>
@@ -88,7 +86,7 @@ int main(int argc,char** argv) {
                     <<" candidates="<<matches.size()<<" model="<<geometry.model<<" inliers="
                     <<std::count(geometry.inlier_mask.begin(),geometry.inlier_mask.end(),'1')<<'\n'<<std::flush;
             }
-            previous=std::move(current); // Same feature indices reused by the next adjacent pair.
+            previous=std::move(current);
         }
         output.flush(); check(bool(output),"Failed writing P1 observations");
         return 0;

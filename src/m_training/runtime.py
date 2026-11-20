@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Atomic artifacts, reproducibility and exact checkpoint state."""
 from datetime import datetime, timezone
 from pathlib import Path
 import hashlib

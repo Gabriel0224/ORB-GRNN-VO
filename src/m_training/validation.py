@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Complete held-out validation and causal sequence-05 trajectories."""
 import time
 import numpy as np
 import torch

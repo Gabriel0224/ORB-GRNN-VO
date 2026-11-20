@@ -1,13 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""GRNN-VO: point MLP, causal trajectory graph, Point-MILA and temporal LSTM.
-
-Module creation order and state_dict keys match the reference model.
-"""
 import torch
 from torch import nn
 
 class TrajectoryLayer(nn.Module):
-    """One incoming temporal edge at most; gather is exactly its mean aggregation."""
+    """At most one incoming temporal edge per node."""
     def __init__(self,width=64):
         super().__init__()
         self.root=nn.Linear(width,width,bias=False)

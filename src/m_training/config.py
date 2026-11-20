@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Explicit configuration without machine-specific paths or import side effects."""
 from copy import deepcopy
 from pathlib import Path
 import hashlib
