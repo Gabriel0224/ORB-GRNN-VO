@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""User images -> P1 observations -> normalized point features; labels are separate."""
+"""User images -> ORB observations -> normalized point features; labels are separate."""
 import argparse
 import json
 from pathlib import Path
@@ -106,7 +106,7 @@ def candidates_from_observations(path, K):
                 if mask.any():
                     raise ValueError("Rejected model cannot provide inliers")
             elif mask.sum() < 8 or scores.sum() <= 0 or model != ("H" if scores[0] / scores.sum() > .50 else "F"):
-                raise ValueError("H/F selection does not follow the pinned P1 rule")
+                raise ValueError("H/F selection does not follow the ORB frontend rule")
             if frame == 0:
                 if len(matches):
                     raise ValueError("First image must not have an adjacent match list")
@@ -175,7 +175,7 @@ def extract_dataset(dataset, output, binary, seed=42, with_labels=False):
         image_hashes = [sha256(p) for p in files]
         observation = export(files, item["settings"], width, height, output / "native" / name, binary, seed)
         if [sha256(p) for p in files] != image_hashes:
-            raise ValueError("Source images changed during P1 extraction")
+            raise ValueError("Source images changed during ORB extraction")
         arrays = candidates_from_observations(observation, K)
         pairs = len(files) - 1
         if len(arrays["offsets"]) != pairs + 1:
@@ -230,7 +230,7 @@ def extract_dataset(dataset, output, binary, seed=42, with_labels=False):
             reference["sequences"][name] = {"labels_file": f"labels/seq{name}.npz", "labels_sha256": sha256(label),
                                            "cam0_pose_text_sha256": sha256(pose_path), "pose_frame": "camera"}
         manifest["sequences"][name] = spec
-        print(f"P1 {name}: {len(files)} images, {pairs} pairs, {len(arrays['x'])} geometric inliers", flush=True)
+        print(f"ORB frontend {name}: {len(files)} images, {pairs} pairs, {len(arrays['x'])} geometric inliers", flush=True)
     if with_labels:
         atomic_json(output / "reference" / "manifest.json", reference)
     atomic_json(output / "manifest.json", manifest)
@@ -238,7 +238,7 @@ def extract_dataset(dataset, output, binary, seed=42, with_labels=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract P1 features from user images; images and calibration are required")
+    parser = argparse.ArgumentParser(description="Extract ORB features from user images; images and calibration are required")
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--build-dir", required=True)

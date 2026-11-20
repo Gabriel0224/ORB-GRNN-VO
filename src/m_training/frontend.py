@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Build and run the independent, pose-free P1 image frontend."""
+"""Build and run the independent, pose-free ORB image frontend."""
 import argparse
 import json
 from pathlib import Path
@@ -35,7 +35,7 @@ def build(build_directory, jobs=2):
             subprocess.run(["cmake", "--build", str(build_directory), "--parallel", str(jobs)],
                            check=True, stdout=log, stderr=subprocess.STDOUT)
         except (OSError, subprocess.CalledProcessError) as error:
-            raise RuntimeError(f"P1 build failed. Install CMake, a C++ compiler, OpenCV development files and Eigen3; inspect {build_directory / 'build.log'}") from error
+            raise RuntimeError(f"ORB frontend build failed. Install CMake, a C++ compiler, OpenCV development files and Eigen3; inspect {build_directory / 'build.log'}") from error
     binary = build_directory / "p1_export"
     if not binary.exists():
         raise FileNotFoundError("Expected p1_export from the CMake build")
@@ -50,26 +50,26 @@ def verify_binary(binary):
                 "geometry_header_sha256": "geometry.hpp", "build_sha256": "CMakeLists.txt",
                 "extractor_sha256": "vendor/ORBextractor.cc", "header_sha256": "vendor/ORBextractor.h"}
     if any(info.get(key) != sha256(NATIVE / name) for key, name in expected.items()):
-        raise ValueError("P1 executable does not match the distributed sources; rebuild it")
+        raise ValueError("ORB frontend executable does not match the distributed sources; rebuild it")
     if info.get("pose_estimation") is not False or info.get("schema_version") != 2:
-        raise ValueError("Expected the pose-free P1 frontend")
+        raise ValueError("Expected the pose-free ORB frontend")
     return info
 
 
 def validate_settings(settings, width, height):
     if set(settings) != set(DEFAULTS):
-        raise ValueError("Unsupported P1 frontend settings")
+        raise ValueError("Unsupported ORB frontend settings")
     import math
     if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in settings.values()):
-        raise ValueError("P1 settings must be finite numbers")
+        raise ValueError("ORB settings must be finite numbers")
     ints = ["nfeatures", "nlevels", "fast_threshold", "min_fast_threshold", "max_hamming", "octave_tolerance"]
     if any(type(settings[k]) is not int for k in ints):
-        raise ValueError("Integer P1 settings cannot be fractional")
+        raise ValueError("Integer ORB settings cannot be fractional")
     if (min(width, height, settings["nfeatures"], settings["nlevels"], settings["min_fast_threshold"]) <= 0
             or settings["fast_threshold"] < settings["min_fast_threshold"] or settings["scale_factor"] <= 1
             or settings["search_radius"] <= 0 or not 0 < settings["ratio_threshold"] < 1
             or not 0 <= settings["max_hamming"] <= 256 or not 0 <= settings["octave_tolerance"] < settings["nlevels"]):
-        raise ValueError("Invalid P1 extraction/matching settings")
+        raise ValueError("Invalid ORB extraction/matching settings")
     if min(width, height) / settings["scale_factor"] ** (settings["nlevels"] - 1) < 64:
         raise ValueError("Image pyramid becomes too small; supply larger images or explicitly reduce nlevels")
 
@@ -96,7 +96,7 @@ def export(images, settings, width, height, directory, binary, seed):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build P1 from the bundled source; no model weights or vocabulary required")
+    parser = argparse.ArgumentParser(description="Build the ORB frontend from the bundled source; no model weights or vocabulary required")
     parser.add_argument("--build-dir", required=True)
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()

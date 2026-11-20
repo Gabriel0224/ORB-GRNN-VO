@@ -1,55 +1,37 @@
-# 自备图像和标签
+# Input guide
 
-使用 `configs/images.example.yaml` 描述数据。所有相对路径相对于**数据 YAML 所在目录**，不是 shell 当前目录。示例内参只是格式演示，必须替换。
+**English** | [简体中文](IMAGES.zh-CN.md)
 
-## 图像
+Start from [images.example.yaml](../configs/images.example.yaml). Paths are relative to the dataset YAML file. Replace the example intrinsics with your camera calibration.
 
-每个序列填写 `split: train` 或 `validation`。训练入口要求至少一个训练序列和恰好一个独立、连续、完整标注的验证序列。每条至少11幅图像。训练和验证不能引用同一个图像文件；还需自行确保不同文件没有重复内容或相邻片段泄漏。
+## Images and calibration
 
-两种排列方式任选一种：
+- Supply one or more `train` sequences and one separate `validation` sequence, each with at least 11 images.
+- Use `images` plus `pattern` for a directory in natural filename order, or `image_list` for an explicit ordered list. Paths inside an image list are relative to that list.
+- Supply undistorted/rectified images, set `rectified: true`, and provide the matching zero-skew 3×3 `intrinsics`. Image size must remain constant within a sequence. No automatic resizing is applied.
+- Keep training and validation data separate. The ORB frontend processes adjacent images without using pose labels or future frames.
 
-1. `images: ./sequence/images` 加 `pattern: '*.png'`。常见 PNG/JPEG/BMP/TIFF 均可，按文件名自然数字顺序读取，例如 frame2 在 frame10 前。
-2. `image_list: ./sequence/images.txt`。每行一张图像路径，严格按行序读取；其中相对路径相对于列表文件所在目录。适用于文件名不能直接表达采集顺序的情况。
+## Pose labels
 
-P1 对当前和上一张图像做灰度 ORB 提取/匹配。不使用词袋、地图、回环或 SLAM 位姿。不同序列互不继承状态。第一张图像只提取特征；N张图像产生N−1个相邻帧对，空匹配帧对仍保留。
+Supervised training requires one camera-to-world pose per image, in the same camera frame as the images. Set `pose_convention: camera_to_world` and `translation_unit: meter`.
 
-图像须已校正畸变，设置 `rectified: true` 代表使用者确认。每条序列尺寸固定；程序不做隐式缩放。`intrinsics` 是这些输入像素的3×3、零 skew 的 pinhole 内参。若裁剪或缩放图像，应先正确更新内参。不要把其他相机、原始畸变图或不同分辨率的内参直接套用。8层、scale1.2 的默认 ORB 金字塔要求最短边约至少230像素；更小图像会明确报错。
-
-## 监督标签
-
-`poses` 为文本，每行12个数，表示一张图像对应的3×4变换，按行展开：
+The `poses` text file contains one row-major 3×4 matrix per line:
 
 ```text
 r00 r01 r02 tx r10 r11 r12 ty r20 r21 r22 tz
 ```
 
-变换约定为 `T_world_camera`，即相机坐标转世界坐标。相机与输入图像的标定相机必须一致；平移单位米。填写 `pose_convention: camera_to_world`、`translation_unit: meter`。旋转矩阵需为SO(3)。行数与图像数相等。
+Rotations must be valid rotation matrices. Relative targets are computed as `inverse(T[t]) @ T[t+1]`. Provide either increasing `timestamps` in seconds or a positive `fps`.
 
-程序用 `inverse(T[t]) @ T[t+1]` 生成相对标签，转成 `[yaw,pitch,roll,tx,ty,tz]`；角单位弧度，`R=Rz(yaw) @ Ry(pitch) @ Rx(roll)`。这里 yaw 绕相机Z轴，不能直接称作地面航向。
+Optional `valid_pairs` and `source_ids` files contain one value per adjacent image pair. Training windows must contain valid pairs from a single source. Validation requires a fully labeled continuous sequence.
 
-提供 `timestamps` 文本（一行一个时间，单位秒），或 `fps: 10.0` 等真实帧率。时间戳严格递增且与图像一一对应。时间戳用于数据核验，**不作为额外网络特征**；变化很大的采样间隔会改变数据分布。
+## Generated files
 
-本包不会自动获得真值，也不重新融合已有 fused10。用户自己的位姿来源记为 `user_provided_camera_poses`，不能把它称作原实验 fused10。只有图像而没有标签时可用 `m-extract`，不能启动监督训练。
+`generated-inputs/` stores ORB observations, point features, and prepared labels; `prepared/` stores training batches. Both remain after training. The [intermediate format](INPUTS.md) is documented for integrations.
 
-## 可选的训练有效性和来源边界
+To extract features without pose labels:
 
-- `valid_pairs`：文本，N−1个0或1，标识哪些相邻帧对可监督。
-- `source_ids`：文本，N−1个整数，标识标签的连续来源。
-
-缺省均有效且同一来源。只有窗口内10个帧对全部有效且来源一致才用于训练；按连续有效起点区间分组，每组最多64个，保留尾组。验证要求整个序列有效且单一来源。无效标签不能用NaN占位；输入格式仍需有限且合法的位姿。
-
-## P1设置与中间表示
-
-默认值在 `frontend.DEFAULTS`，与现有P1流程相同：ORB2000点、scale1.2、8层、FAST20/7、搜索半径100像素、ratio0.9、最大Hamming50、octave容差1。H/F RANSAC使用原始实现与种子42；不读取真值。全部被选中模型的内点按距离和特征下标稳定排序。六维点特征为按逐序列内参归一化的 `[x1,y1,x2,y2,dx,dy]`。
-
-默认没有整数像素碰撞删点，也没有把编号当成数值特征。图边由共享图像特征下标构造；打包时每个窗口首帧对断开外部连接。
-
-原始历史KITTI驱动可能将图像缩放到固定尺寸。本通用图像入口**不隐式缩放**，避免错误套用内参。因此要复现旧输入，须自行准备相同的实际像素和对应标定；使用不同图像尺寸不能声称输入完全相同。
-
-## 产物与保留
-
-一键入口的 `generated-inputs/` 包含P1记录、点集及生成的标签文件；`prepared/` 包含CPU预打包批次。它们由用户运行时生成，**训练完成后全部保留，程序不会自动删除**。中断期间同样保留，供准确恢复及后续复用。
-
-恢复检查图像顺序和内容、标签、时间戳及来源边界是否改变，不能悄悄套用旧缓存。CPU预处理不会初始化正式模型或消耗正式训练随机状态。
-
-“不带缓存”指发布的源码包和Git仓库不含已有缓存文件。用户运行后生成、使用和保留缓存属于正常工作流程。运行产物已列入 `.gitignore`，不要将自己的图片、标签、缓存或权重提交到源码仓库。
+```bash
+grnn-vo-extract --dataset ./dataset.yaml --output ./generated/orb \
+  --build-dir ./build/orb
+```

@@ -28,9 +28,9 @@ def load_config(path):
     elif protocol != "custom_images":
         raise ValueError("Unknown data protocol")
     if config["data"]["window_length"] != 10 or config["training"]["batch_size"] != 64:
-        raise ValueError("This M configuration requires ten-pair windows and batch 64")
+        raise ValueError("This GRNN-VO configuration requires ten-pair windows and batch 64")
     if data["window_stride"] != 1 or data["camera"] not in ("image_2", "camera"):
-        raise ValueError("M uses stride-one windows and an explicit camera frame")
+        raise ValueError("GRNN-VO uses stride-one windows and an explicit camera frame")
     expected_reference = "fused10" if protocol == "kitti_fused10" else "provided_poses"
     if data["input"] != "p1_all_float_inliers" or data["reference"] != expected_reference:
         raise ValueError("Input/reference definition disagrees with the data protocol")
@@ -41,18 +41,21 @@ def load_config(path):
         raise ValueError("Expected counts must be positive integers, or null for custom data")
     if protocol == "kitti_fused10" and data["expected_counts"] is None:
         raise ValueError("Frozen KITTI counts cannot be omitted")
-    if config["model"] != {"name": "M", "parameters": 345542, "point_width": 64,
+    model_name = config["model"].get("name")
+    if model_name not in ("GRNN-VO", "M"):
+        raise ValueError("Unknown model name")
+    if config["model"] != {"name": model_name, "parameters": 345542, "point_width": 64,
                             "graph_layers": 2, "lstm_input": 128, "lstm_hidden": 128,
                             "lstm_layers": 2, "dropout": 0.2, "geometry_input": False}:
-        raise ValueError("Model definition differs from the published M architecture")
+        raise ValueError("Model definition differs from the published GRNN-VO architecture")
     t = config["training"]
     from .schedule import V3_LEARNING_RATES
     if tuple(t["learning_rates"]) != V3_LEARNING_RATES or t["patience"] != 20:
-        raise ValueError("M uses the ten-stage validation schedule with patience 20")
+        raise ValueError("GRNN-VO uses the ten-stage validation schedule with patience 20")
     if not 1 <= t["max_epochs"] <= 300:
         raise ValueError("max_epochs must be between 1 and 300")
     if t["axis_weights"] != [300, 300, 300, 1, 1, 1]:
-        raise ValueError("The M pose-loss weights must be 300/300/300/1/1/1")
+        raise ValueError("The GRNN-VO pose-loss weights must be 300/300/300/1/1/1")
     if t["weight_decay"] != 0 or t["gradient_clip"] != 10 or t["precision"] != "float32":
         raise ValueError("Expected weight_decay=0, clip=10 and FP32")
     e = config["execution"]

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""M: point MLP, causal trajectory graph, Point-MILA and temporal LSTM.
+"""GRNN-VO: point MLP, causal trajectory graph, Point-MILA and temporal LSTM.
 
 Module creation order and state_dict keys match the reference model.
 """

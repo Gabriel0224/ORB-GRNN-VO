@@ -69,7 +69,7 @@ def prepare(config, inputs, output, inspect_only=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
-    parser.add_argument("--inputs", required=True, help="Read-only P1 candidates and reference folder")
+    parser.add_argument("--inputs", required=True, help="Read-only ORB candidates and reference folder")
     parser.add_argument("--prepared", required=True, help="New directory for CPU packs and input audit")
     parser.add_argument("--inspect-only", action="store_true", help="Verify hashes, windows and grouping without writing batch tensors")
     args = parser.parse_args()

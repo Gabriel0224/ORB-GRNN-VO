@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "m-visual-odometry-training"
-version = "0.3.0"
-description = "P1 image frontend and M point-set visual odometry training"
+name = "orb-grnn-vo"
+version = "0.3.1"
+description = "Monocular visual odometry with an ORB frontend and a GRNN-VO network"
 readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
@@ -13,6 +13,9 @@ requires-python = ">=3.10"
 dependencies = ["torch==2.4.1", "numpy==1.26.4", "scipy==1.14.1", "PyYAML==6.0.2", "opencv-python-headless==4.10.0.84"]
 
 [project.scripts]
+grnn-vo-train = "m_training.image_pipeline:main"
+grnn-vo-extract = "m_training.images:main"
+grnn-vo-build-orb = "m_training.frontend:main"
 m-prepare = "m_training.prepare:main"
 m-train = "m_training.train:main"
 m-build-p1 = "m_training.frontend:main"

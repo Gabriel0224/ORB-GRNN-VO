@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Train M from scratch, with complete validation and exact-state recovery."""
+"""Train GRNN-VO from scratch, with complete validation and exact-state recovery."""
 import argparse
 import copy
 import json

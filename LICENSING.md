@@ -1,6 +1,6 @@
 # License / 许可证
 
-M image frontend and training package is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ORB-GRNN-VO is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the full GNU General Public License.
 
@@ -10,7 +10,7 @@ SPDX identifier: **GPL-3.0-or-later**.
 
 ## Third-party portions
 
-- P1 的 ORB 提取器及其派生匹配/几何代码：保留原有GPL、版权和OpenCV来源声明。
+- ORB 前端的特征提取器及其派生匹配/几何代码：保留原有GPL、版权和OpenCV来源声明。
 - MLLA / Point-MILA：保留上游MIT许可及版权声明。
 - 依赖库遵循各自许可；第三方完整发行包不在本源码包中。
 

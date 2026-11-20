@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Read-only P1 candidate inputs; independent causal windows and native grouping."""
+"""Read-only ORB candidate inputs; independent causal windows and native grouping."""
 from collections import OrderedDict
 from pathlib import Path
 import json
@@ -51,7 +51,7 @@ class Sequence:
                 or previous.shape != (len(x),) or len(offsets) != pairs + 1
                 or offsets[0] != 0 or offsets[-1] != len(x) or np.any(np.diff(offsets) < 0)
                 or len(x) != spec["all_geometric_matches"]):
-            raise ValueError(f"Sequence {sequence}: unexpected P1 candidate layout")
+            raise ValueError(f"Sequence {sequence}: unexpected ORB candidate layout")
         if not all(np.isfinite(v).all() for v in [x, uv]) or np.any(previous < -1):
             raise ValueError("Invalid candidate values")
         self.K = np.asarray(spec["P0_intrinsics"], dtype=np.float64)

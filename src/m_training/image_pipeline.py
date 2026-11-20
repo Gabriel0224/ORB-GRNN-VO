@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""One command from user images and supplied pose labels to trained M."""
+"""One command from user images and supplied pose labels to trained GRNN-VO."""
 import argparse
 import copy
 import json
@@ -21,7 +21,7 @@ def pipeline(dataset, config_path, work, device="cuda:0", resume=False, jobs=2, 
     from .train import run
     config = load_config(config_path)
     if config["data"].get("protocol") != "custom_images":
-        raise ValueError("Use configs/m_images.yaml for user-provided images and pose labels")
+        raise ValueError("Use configs/grnn_vo.yaml for user-provided images and pose labels")
     dataset = Path(dataset).resolve()
     records = load_dataset(dataset, require_labels=True)
     train = [k for k, v in records.items() if v["split"] == "train"]
@@ -100,7 +100,7 @@ def pipeline(dataset, config_path, work, device="cuda:0", resume=False, jobs=2, 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", required=True, help="YAML describing user images, intrinsics, timing and camera poses")
-    parser.add_argument("--config", required=True, help="Use configs/m_images.yaml")
+    parser.add_argument("--config", required=True, help="Use configs/grnn_vo.yaml")
     parser.add_argument("--work-dir", required=True, help="New runtime workspace; generated inputs and prepared batches remain after training")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--jobs", type=int, default=2)

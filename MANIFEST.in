@@ -1,4 +1,4 @@
-include README.md LICENSE LICENSING.md THIRD_PARTY_NOTICES.md requirements.txt
+include README.md README.zh-CN.md LICENSE LICENSING.md THIRD_PARTY_NOTICES.md requirements.txt
 recursive-include configs *.yaml
 recursive-include docs *.md
 recursive-include LICENSES *.txt
