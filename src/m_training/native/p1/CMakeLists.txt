@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.16)
+project(orb_crnn_p1_frontend LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(ORB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
+find_package(OpenCV 4 REQUIRED COMPONENTS core imgproc imgcodecs features2d)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# The geometry adapter stops at the F/H inlier mask.
+add_executable(p1_export export.cpp geometry.cpp "${ORB_ROOT}/ORBextractor.cc")
+target_include_directories(p1_export PRIVATE "${ORB_ROOT}" ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(p1_export PRIVATE ${OpenCV_LIBS} Eigen3::Eigen)
+foreach(ENTRY "ADAPTER;export.cpp" "MATCHER;matching.hpp" "GEOMETRY;geometry.cpp"
+              "GEOMETRY_HEADER;geometry.hpp" "BUILD;CMakeLists.txt")
+    list(GET ENTRY 0 LABEL)
+    list(GET ENTRY 1 FILE)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}")
+    file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}" HASH)
+    target_compile_definitions(p1_export PRIVATE "P1_${LABEL}_SHA=\"${HASH}\"")
+endforeach()
+file(SHA256 "${ORB_ROOT}/ORBextractor.cc" EXTRACTOR_HASH)
+file(SHA256 "${ORB_ROOT}/ORBextractor.h" HEADER_HASH)
+target_compile_definitions(p1_export PRIVATE
+    "P1_EXTRACTOR_SHA=\"${EXTRACTOR_HASH}\"" "P1_HEADER_SHA=\"${HEADER_HASH}\"")

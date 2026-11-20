@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "m-visual-odometry-training"
+version = "0.3.0"
+description = "P1 image frontend and M point-set visual odometry training"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
+requires-python = ">=3.10"
+dependencies = ["torch==2.4.1", "numpy==1.26.4", "scipy==1.14.1", "PyYAML==6.0.2", "opencv-python-headless==4.10.0.84"]
+
+[project.scripts]
+m-prepare = "m_training.prepare:main"
+m-train = "m_training.train:main"
+m-build-p1 = "m_training.frontend:main"
+m-extract = "m_training.images:main"
+m-train-images = "m_training.image_pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+license-files = ["LICENSE", "LICENSING.md", "THIRD_PARTY_NOTICES.md", "LICENSES/*.txt"]
+
+[tool.setuptools.package-data]
+m_training = ["native/p1/*.cpp", "native/p1/*.hpp", "native/p1/*.txt", "native/p1/*.json", "native/p1/vendor/*.cc", "native/p1/vendor/*.h"]

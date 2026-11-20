@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+seed: 42
+data:
+  train_sequences:
+  - train_a
+  validation_sequence: validation_a
+  window_length: 10
+  window_stride: 1
+  camera: camera
+  input: p1_all_float_inliers
+  reference: provided_poses
+  expected_counts: null
+  protocol: custom_images
+model:
+  name: M
+  parameters: 345542
+  point_width: 64
+  graph_layers: 2
+  lstm_input: 128
+  lstm_hidden: 128
+  lstm_layers: 2
+  dropout: 0.2
+  geometry_input: false
+training:
+  max_epochs: 300
+  batch_size: 64
+  axis_weights:
+  - 300
+  - 300
+  - 300
+  - 1
+  - 1
+  - 1
+  learning_rates:
+  - 0.0001
+  - 7.0e-05
+  - 4.0e-05
+  - 1.0e-05
+  - 7.0e-06
+  - 4.0e-06
+  - 1.0e-06
+  - 7.0e-07
+  - 4.0e-07
+  - 1.0e-07
+  patience: 20
+  weight_decay: 0
+  gradient_clip: 10
+  precision: float32
+execution:
+  implementation: reference
+  frame_chunk_size: 32
+  activation_checkpointing: true
+  retain_nodes: 65536
+  graph_checkpointing: false
+  cpu_threads: 4
+  pin_memory: true
+  batch_cache_size: 4
+saving:
+  last_every_steps: 50
+  selection_last_epochs: 50

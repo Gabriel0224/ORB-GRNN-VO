@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+schema: m-images-v1
+frontend:
+  nfeatures: 2000
+  scale_factor: 1.2
+  nlevels: 8
+  fast_threshold: 20
+  min_fast_threshold: 7
+  search_radius: 100.0
+  ratio_threshold: 0.9
+  max_hamming: 50
+  octave_tolerance: 1
+sequences:
+  train_a:
+    split: train
+    images: ./my_data/train_a/images
+    pattern: '*.png'
+    # Replace all intrinsics with the calibration of YOUR rectified images.
+    intrinsics: [[700.0, 0.0, 620.0], [0.0, 700.0, 188.0], [0.0, 0.0, 1.0]]
+    rectified: true
+    poses: ./my_data/train_a/poses.txt
+    pose_convention: camera_to_world
+    translation_unit: meter
+    fps: 10.0
+  validation_a:
+    split: validation
+    images: ./my_data/validation_a/images
+    pattern: '*.png'
+    intrinsics: [[700.0, 0.0, 620.0], [0.0, 700.0, 188.0], [0.0, 0.0, 1.0]]
+    rectified: true
+    poses: ./my_data/validation_a/poses.txt
+    pose_convention: camera_to_world
+    translation_unit: meter
+    fps: 10.0
