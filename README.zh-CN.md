@@ -34,6 +34,10 @@ grnn-vo-train --dataset ./dataset.yaml --config configs/grnn_vo.yaml \
 
 权重、日志和验证轨迹保存在运行目录中，生成的缓存会保留以便复用。仓库只提供源码，不包含数据集、模型权重或预生成缓存。
 
+## 姿态校正
+
+验证同时计算第 3.3 节的因果姿态偏差校正：由 ORB 内点估计本质矩阵旋转，每个旋转向量分量使用 176 个标量卡尔曼滤波器。当前输出只使用此前的观测，平移保持不变。候选方差和初始方差（度²）在 `attitude_correction` 中配置。每轮轨迹文件保留 `prediction`，新增 `prediction_corrected`；验证指标分别记录 `ate_first_pose_m` 和 `ate_first_pose_corrected_m`，均为初始位姿对齐、固定尺度的 ATE。训练损失、调度和选模继续使用原始未校正输出。
+
 ## 许可证
 
 [GPL-3.0-or-later](LICENSE)。ORB-SLAM3 和 MLLA 的来源及声明见[第三方许可说明](THIRD_PARTY_NOTICES.md)。

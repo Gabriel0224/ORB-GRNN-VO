@@ -44,6 +44,24 @@ def validate(model, sequence, batches, config, device, progress=None):
         if seen != expected["validation_windows"] or len(batches) != expected["validation_batches"] or not np.isfinite(relative).all():
             raise ValueError("Incomplete or nonfinite sequence-05 validation")
         prediction, metrics = trajectory_result(relative, sequence)
+        trajectory = {"prediction": prediction, "ground_truth": sequence.gt, "relative_prediction": relative}
+        correction = config.get("attitude_correction")
+        if correction is not None and correction.get("enabled", True):
+            from .attitude_correction import estimate_sequence_rotations, correct_relative_poses
+            if not hasattr(sequence, "_attitude_geometry"):
+                sequence._attitude_geometry = estimate_sequence_rotations(sequence.uv, sequence.K)
+            rotations, valid = sequence._attitude_geometry
+            corrected, bias = correct_relative_poses(relative, rotations, valid, correction)
+            corrected_prediction, corrected_metrics = trajectory_result(corrected, sequence)
+            corrected_ate = corrected_metrics["ate_first_pose_m"]
+            if not np.isfinite(corrected_ate):
+                raise FloatingPointError("Nonfinite corrected validation trajectory")
+            metrics.update(ate_first_pose_corrected_m=corrected_ate,
+                           geometric_rotation_valid_pairs=int(valid.sum()),
+                           geometric_rotation_missing_pairs=int((~valid).sum()))
+            trajectory.update(prediction_corrected=corrected_prediction,
+                              relative_prediction_corrected=corrected,
+                              geometric_rotation_valid=valid, rotation_bias_correction_deg=bias)
         result = {f"validation_{k}": v / seen for k, v in sums.items()}
         if not all(np.isfinite(v) for v in result.values()) or not np.isfinite(metrics["ate_first_pose_m"]):
             raise FloatingPointError("Nonfinite validation loss or trajectory")
@@ -51,7 +69,7 @@ def validate(model, sequence, batches, config, device, progress=None):
                       validation_seconds=time.perf_counter() - start,
                       validation_rotation_loss=sum(result[f"validation_{axis}_loss"] for axis in AXES[:3]),
                       validation_translation_loss=sum(result[f"validation_{axis}_loss"] for axis in AXES[3:]))
-        return result, {"prediction": prediction, "ground_truth": sequence.gt, "relative_prediction": relative}
+        return result, trajectory
     finally:
         model.train(was_training)
         restore_rng(state)

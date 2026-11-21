@@ -34,6 +34,10 @@ The command builds the ORB frontend, prepares features, and starts training. Add
 
 Checkpoints, logs, and validation trajectories are saved in the run directory. Generated caches are retained for reuse. This repository contains source code only; datasets, weights, and precomputed caches are not included.
 
+## Attitude correction
+
+Validation also applies the causal attitude-bias correction from Section 3.3: essential-matrix rotations from ORB inliers drive 176 scalar Kalman filters per rotation-vector component. Each output uses only earlier observations; translation is unchanged. Configure the candidate variances and initial variance (degrees²) in `attitude_correction`. Epoch trajectory files retain `prediction` and add `prediction_corrected`; validation metrics report `ate_first_pose_m` and `ate_first_pose_corrected_m` (first-pose alignment, fixed scale). Training loss, scheduling, and checkpoint selection still use the original uncorrected outputs.
+
 ## License
 
 [GPL-3.0-or-later](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for ORB-SLAM3 and MLLA attribution.

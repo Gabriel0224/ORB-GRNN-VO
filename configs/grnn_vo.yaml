@@ -58,3 +58,12 @@ execution:
 saving:
   last_every_steps: 50
   selection_last_epochs: 50
+attitude_correction:
+  enabled: true
+  q_min_deg2: 1.0e-7
+  q_max_deg2: 1.0e-4
+  q_count: 16
+  eta_min_deg2: 1.0e-3
+  eta_max_deg2: 1.0e-1
+  eta_count: 11
+  v0_deg2: 1.0e-3

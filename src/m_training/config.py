@@ -64,6 +64,11 @@ def load_config(path):
         raise ValueError("Invalid execution resource setting")
     if config["saving"]["last_every_steps"] < 1 or config["saving"]["selection_last_epochs"] != 50:
         raise ValueError("Invalid checkpoint interval or selection range")
+    if "attitude_correction" in config:
+        if not isinstance(config["attitude_correction"], dict):
+            raise ValueError("attitude_correction must be a mapping")
+        from .attitude_correction import filter_parameters
+        filter_parameters(config["attitude_correction"])
     return deepcopy(config)
 
 
